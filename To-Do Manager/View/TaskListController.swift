@@ -50,6 +50,38 @@ class TaskListController: UITableViewController {
     
     // MARK: - Table view data source
 
+    // delete row
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        // delete task row
+        let taskType = sectionsTypesPosition[indexPath.section]
+        tasks[taskType]?.remove(at: indexPath.row)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
+    }
+    
+    // manual tasks list sorting
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPart: IndexPath, to destinationIndexPath: IndexPath) {
+        // From section
+        let taskTypeFrom = sectionsTypesPosition[sourceIndexPart.section]
+        // TO section
+        let taskTypeTo = sectionsTypesPosition[destinationIndexPath.section]
+        
+        // safe-copy task
+        guard let movedTask = tasks[taskTypeFrom]?[sourceIndexPart.row] else { return }
+        
+        // delete task from source place
+        tasks[taskTypeFrom]?.remove(at: sourceIndexPart.row)
+        // insert task to new position
+        tasks[taskTypeTo]?.insert(movedTask, at: destinationIndexPath.row)
+        
+        // if section is changed, change task type in depends of new position
+        if taskTypeFrom != taskTypeTo {
+            tasks[taskTypeTo]?[destinationIndexPath.row].type = taskTypeTo
+        }
+        
+        //reload data
+        tableView.reloadData()
+    }
+    
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let taskType = sectionsTypesPosition[indexPath.section]
         guard let _ = tasks[taskType]?[indexPath.row] else {
