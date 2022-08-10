@@ -48,6 +48,10 @@
                                         <constraint firstItem="a5N-lz-JfR" firstAttribute="bottom" secondItem="M2c-FQ-8Zn" secondAttribute="bottomMargin" id="vgY-sf-1U9"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="symbol" destination="wmk-FX-MWt" id="1N5-px-scF"/>
+                                    <outlet property="title" destination="a5N-lz-JfR" id="wIW-KU-dRv"/>
+                                </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="taskCellStack" id="uFM-kj-Arc" customClass="TaskCell" customModule="To_Do_Manager" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="92.5" width="414" height="43"/>
@@ -82,8 +86,8 @@
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <outlet property="symbol" destination="hyc-Kb-Yxn" id="tst-RR-iNF"/>
-                                    <outlet property="title" destination="Vxm-Hn-bik" id="wzH-OG-Fof"/>
+                                    <outlet property="symbol" destination="hyc-Kb-Yxn" id="Cxr-kg-vVe"/>
+                                    <outlet property="title" destination="Vxm-Hn-bik" id="JH1-X4-OXL"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>

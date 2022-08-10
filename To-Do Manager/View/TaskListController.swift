@@ -73,7 +73,10 @@ class TaskListController: UITableViewController {
 
     // Cell for Table row
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return getConfiguredTaskCell_constraints(for: indexPath)
+        // cell based on constraints
+        //return getConfiguredTaskCell_constraints(for: indexPath)
+        // cell based on H-stack
+        return getConfiguredTaskCell_stack(for: indexPath)
     }
     
     // Cell based on constraints
@@ -106,6 +109,34 @@ class TaskListController: UITableViewController {
         }
         return cell
     }
+    
+    // cell based on H-stack
+    private func getConfiguredTaskCell_stack(for indexPath: IndexPath) -> UITableViewCell {
+        // load cell prototype by identifier
+        let cell = tableView.dequeueReusableCell(withIdentifier: "taskCellStack", for: indexPath) as! TaskCell
+        // get task info for display in cell
+        let taskType = sectionsTypesPosition[indexPath.section]
+        guard let currentTask = tasks[taskType]?[indexPath.row] else {
+            return cell
+        }
+        
+     
+        // edit symbol in cell
+        cell.symbol.text = getSymbolForTask(with: currentTask.status)
+        // edit text in cell
+        cell.title.text = currentTask.title
+        
+        // edit text and symbol color
+        if currentTask.status == .planned {
+            cell.title.textColor = .black
+            cell.symbol.textColor = .black
+        } else {
+            cell.title.textColor = .lightGray
+            cell.symbol.textColor = .lightGray
+        }
+        return cell
+    }
+    
     
     private func getSymbolForTask(with status: TaskStatus) -> String {
         var resultSymbol: String
