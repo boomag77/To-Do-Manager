@@ -24,6 +24,7 @@ class TaskListController: UITableViewController {
     // Tasks collection
     var tasks: [TaskPriority:[TaskProtocol]] = [:]
     var sectionsTypesPosition: [TaskPriority] = [.important, .normal]
+    var tasksStatusPosition: [TaskStatus] = [.planned, .completed]
 
     private func loadTasks() {
         sectionsTypesPosition.forEach { taskType in
@@ -31,6 +32,15 @@ class TaskListController: UITableViewController {
         }
         tasksStorage.loadTasks().forEach { task in
             tasks[task.type]?.append(task)
+        }
+        
+        // sorting tasks list
+        for (taskGroupPriority, taskGroup) in tasks {
+            tasks[taskGroupPriority] = taskGroup.sorted { task1, task2 in
+                let task1position = tasksStatusPosition.firstIndex(of: task1.status) ?? 0
+                let task2position = tasksStatusPosition.firstIndex(of: task2.status) ?? 0
+                return task1position < task2position
+            }
         }
     }
     
