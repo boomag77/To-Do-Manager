@@ -16,13 +16,24 @@ class TaskListController: UITableViewController {
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        self.navigationItem.leftBarButtonItem = self.editButtonItem
     }
     
     // Tasks storage
     var tasksStorage: TasksStorageProtocol = TasksStorage()
     // Tasks collection
-    var tasks: [TaskPriority:[TaskProtocol]] = [:]
+    var tasks: [TaskPriority:[TaskProtocol]] = [:] {
+        didSet {
+            // sorting tasks list
+            for (taskGroupPriority, taskGroup) in tasks {
+                tasks[taskGroupPriority] = taskGroup.sorted { task1, task2 in
+                    let task1position = tasksStatusPosition.firstIndex(of: task1.status) ?? 0
+                    let task2position = tasksStatusPosition.firstIndex(of: task2.status) ?? 0
+                    return task1position < task2position
+                }
+            }
+        }
+    }
     var sectionsTypesPosition: [TaskPriority] = [.important, .normal]
     var tasksStatusPosition: [TaskStatus] = [.planned, .completed]
 
@@ -34,18 +45,47 @@ class TaskListController: UITableViewController {
             tasks[task.type]?.append(task)
         }
         
-        // sorting tasks list
-        for (taskGroupPriority, taskGroup) in tasks {
-            tasks[taskGroupPriority] = taskGroup.sorted { task1, task2 in
-                let task1position = tasksStatusPosition.firstIndex(of: task1.status) ?? 0
-                let task2position = tasksStatusPosition.firstIndex(of: task2.status) ?? 0
-                return task1position < task2position
-            }
-        }
+        
     }
     
     // MARK: - Table view data source
 
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let taskType = sectionsTypesPosition[indexPath.section]
+        guard let _ = tasks[taskType]?[indexPath.row] else {
+            return nil
+        }
+        guard tasks[taskType]?[indexPath.row].status == .completed else {
+            return nil
+        }
+        // create action for status change
+        let actionSwipeInstance = UIContextualAction(style: .normal, title: "Not completed") {
+            _,_,_ in
+            self.tasks[taskType]?[indexPath.row].status = .planned
+            self.tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+            // return configured object
+        }
+        return UISwipeActionsConfiguration(actions: [actionSwipeInstance])
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // 1. Check of task existing
+        let taskType = sectionsTypesPosition[indexPath.section]
+        guard let _ = tasks[taskType]?[indexPath.row] else { return }
+        
+        // 2. Check task is not complited
+        guard tasks[taskType]?[indexPath.row].status != .completed else {
+            tableView.deselectRow(at: indexPath, animated: true)
+            return
+        }
+        
+        // 3. Set task status as Completed
+        tasks[taskType]?[indexPath.row].status = .completed
+        
+        // 4. Reload section of table
+        tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+    }
+    
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         var title: String?
         let tasksType = sectionsTypesPosition[section]
